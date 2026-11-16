@@ -1,88 +1,206 @@
-# D3 starter
+# ALIEN FRONTIER
 
-A walking skeleton: one thin slice of a game that works from end to end. The player moves gridwise over a big seeded world, with a game core that knows nothing about Phaser and a Phaser client that presents what the core reports. Assignment instructions are on Canvas.
+**CMPM 121 · D3 — World and Progression Modeling · Fall 2026**
 
-Install [Deno](https://docs.deno.com/runtime/getting_started/installation/) and [Git](https://git-scm.com/downloads). Create your own repository from this template, clone it, open a terminal in that folder, and run `deno task setup` once. Run `deno task dev` and open the local URL printed in the terminal (normally `http://localhost:3000`). Arrow keys move. Add `?seed=7` to the URL for another world. Open the repository folder itself in VS Code, not a parent folder, and accept the recommended Deno extension. If Phaser still shows errors or `any` after `deno task setup`, type or save in that file once.
+**Alien Frontier** is a small, browser-based exploration and crafting game. You are stranded on an alien planet with an empty inventory and one mission: gather resources, build a **Rescue Beacon**, and signal an extraction vessel.
 
-## Two folders, two rules
+The world is procedurally generated from a seed. Explore with the arrow keys, harvest materials from different biomes, craft tools to overcome barriers, and assemble the final technology needed to escape. The game is presented inside a fixed-size, sci-fi arcade console with a Phaser grid, an inventory and crafting terminal, event messages, and synthesized sound.
 
-- **`core/`** holds the game itself: plain-data state, the seeded terrain function, and `apply(state, command)`. It has no clock, no animation, no browser, and no Phaser. A command updates the state it is given, immediately, and returns events: a record of what happened. Events are kept and played later while state keeps changing, so an event gets its own copies of any cells it reports, never an object that state still holds.
-- **`game/`** is the client, wired together in `game/main.ts`. `controller.ts` turns keys into commands, `presenter.ts` plays events in order, and three outputs show each event as it plays: the Phaser grid (`grid/grid_view.ts`), the HUD (`hud.ts`, page elements in `index.html` styled by `style.css`), and sound (`sounds.ts`). The controller holds input while an event plays and calls the core when it ends. That busy state lives only in `game/`.
+**Source code:** https://github.com/rtlieu-cyber/d3_cmpm121\
+**Play online:** Check the repository's GitHub Pages deployment once published and verified.
 
-**Rule one:** `core/` never depends on `game/`, Phaser, or anything else outside `core/`. `game/` imports the core through `../core/mod.ts`. Game rules belong in `core/`, where tests can reach them without a browser. `console` is allowed in `core/` for debugging.
+## How to play
 
-**Rule two:** only `game/grid/` may import Phaser. Phaser is here for one narrow job, drawing the grid and moving its camera. Everything around the grid is ordinary web page, so style it with CSS and make it your own.
+| Control              | Action                                                        |
+| -------------------- | ------------------------------------------------------------- |
+| **Arrow keys**       | Move one tile at a time; holding an arrow continues movement. |
+| **E**                | Gather a resource from the tile you occupy.                   |
+| **Crafting buttons** | Craft an item when you have the required ingredients.         |
+| **Sound: On/Off**    | Mute or unmute audio feedback.                                |
+| **F5 / Refresh**     | Restart on the same seed with an empty inventory.             |
 
-Phaser has no device-pixel setting of its own, so `grid_view.ts` sizes the canvas backing store to CSS size times `devicePixelRatio` and zooms the camera to match. Draw in logical pixels and the grid stays crisp on high-resolution displays. The view has a fixed CSS size. A change in pixel ratio is handled, and a window resize changes the page layout only.
+**Objective:** Craft the **Rescue Beacon**. Each resource-producing tile can be gathered **only once**, so explore for fresh tiles as your supplies run out. Crafting recipes display the ingredients you are missing.
 
-Sound uses the browser's Web Audio API directly, because Phaser plays loaded audio but has no synthesis. Audio starts on the first key press or click, as browsers require, and the page plays on silently if audio is unavailable. Change the notes in `sounds.ts` to change how your game sounds.
+### Terrain and resources
 
-## Testing entry points
+| Terrain           | Appearance  | Resource    | Access                 |
+| ----------------- | ----------- | ----------- | ---------------------- |
+| **Scrap Flats**   | Rust orange | Scrap Metal | Available immediately  |
+| **Fungal Grove**  | Green       | Biofiber    | Available immediately  |
+| **Toxic Marsh**   | Purple      | Ion Crystal | Requires a Filter Suit |
+| **Basalt Cliffs** | Dark gray   | None        | Impassable             |
 
-These are supported, for people and for agents driving a browser: `?seed=7` selects a world, `game.state` in the browser console reads logical state (the `game` handle is set in `game/main.ts`), and the `#live` element holds the most recent played event as text, since a canvas is opaque to accessibility-tree tools. [TESTING.md](TESTING.md) is a manual test script. No browser step runs in `deno task ci`.
+The **Filter Suit** is reusable: once crafted, it stays in your inventory and allows you to move into Toxic Marsh tiles. Basalt Cliffs remain impassable.
 
-## Patterns you are already using
+### Crafting recipes
 
-Named here so you can read about them. Each also appears in a one-line comment where it is used.
+| Crafted item         | Ingredients                                       | Purpose                                     |
+| -------------------- | ------------------------------------------------- | ------------------------------------------- |
+| **Insulated Wire**   | 2 Scrap Metal + 1 Biofiber                        | Basic component for more advanced equipment |
+| **Filter Suit**      | 1 Insulated Wire + 2 Biofiber                     | Unlocks Toxic Marsh                         |
+| **Power Cell**       | 2 Ion Crystals + 1 Scrap Metal                    | Powers the rescue equipment                 |
+| **Signal Amplifier** | 1 Ion Crystal + 1 Insulated Wire                  | Boosts the distress signal                  |
+| **Rescue Beacon**    | 1 Power Cell + 1 Signal Amplifier + 3 Scrap Metal | Ends the game with a victory message        |
 
-- [Command](https://gameprogrammingpatterns.com/command.html): keys and tests drive the core with the same `Command` objects.
-- [Event Queue](https://gameprogrammingpatterns.com/event-queue.html): the presenter separates when an event is produced from when it is played.
-- [Observer](https://gameprogrammingpatterns.com/observer.html): the grid, the HUD, and sound each hear played events, and do not know about each other.
-- [Mediator](https://refactoring.guru/design-patterns/mediator): the controller stands between input, the core, and the presenter.
-- [Facade](https://refactoring.guru/design-patterns/facade): `apply` and `core/mod.ts` are the one way in.
-- [Domain Event](https://martinfowler.com/eaaDev/DomainEvent.html): `GameEvent` says what happened in the game's own terms.
-- [Humble Object](http://xunitpatterns.com/Humble%20Object.html): the grid view only shows events and decides nothing, because the logic lives in `core/`.
-- [Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture): the core is the inside, and keys, tests, the grid, the HUD, and sound all sit outside it. No formal port is declared.
-- [Aliasing Bug](https://martinfowler.com/bliki/AliasingBug.html) and [Value Object](https://martinfowler.com/bliki/ValueObject.html): `apply` mutates state, so events copy their cells.
-- [Given-When-Then](https://martinfowler.com/bliki/GivenWhenThen.html): the shape of the sample unit tests.
-- [Singleton](https://gameprogrammingpatterns.com/singleton.html), avoided on purpose: `newGame(seed)` makes as many worlds as tests need.
+The current crafting chain requires **8 Scrap Metal, 4 Biofiber, and 3 Ion Crystals** in total, assuming no wasted crafting. The recipes themselves are defined in [`core/recipes.ts`](core/recipes.ts).
 
-## Tests
+### Progression
 
-`deno task test` runs every `*_test.ts` file in `core/`, with no browser involved. The samples show the shape: a move, a blocked move that changes nothing, an event that keeps its cells while state moves on, terrain determinism, a check that no seed starts walled in, and a replay that plays the same seed and commands twice and compares the results. Add your own beside them.
+```text
+START — crash-landed, empty inventory
+  |
+  v
+Gather Scrap Metal + Biofiber
+  |
+  v
+Craft Insulated Wire
+  |
+  v
+Craft Filter Suit ──> Toxic Marsh becomes accessible
+  |                          |
+  |                          v
+  |                    Gather Ion Crystals
+  |                          |
+  +--------------------------+
+                             |
+                             v
+                 Craft Power Cell
+                 Craft another Insulated Wire
+                 Craft Signal Amplifier
+                             |
+                             v
+                    Craft Rescue Beacon
+                             |
+                             v
+              MISSION COMPLETE — Rescue inbound!
+```
 
-## Tasks
+## Run locally
 
-| Task                 | What it does                                                          |
-| -------------------- | --------------------------------------------------------------------- |
-| `deno task setup`    | Install dependencies and turn on the commit hook (once per clone)     |
-| `deno task dev`      | Run the game locally                                                  |
-| `deno task test`     | Run the core's tests                                                  |
-| `deno task check`    | Type-check `core/` and `game/`, each under its own `deno.json`        |
-| `deno task boundary` | Check what `core/` imports, and that only `game/grid/` imports Phaser |
-| `deno task fmt`      | Fix formatting                                                        |
-| `deno task lint`     | Lint                                                                  |
-| `deno task build`    | Build the site into `dist/`                                           |
-| `deno task preview`  | Serve the built `dist/` locally                                       |
-| `deno task ci`       | Run every gate below, in order                                        |
+**Requirements:** [Deno](https://docs.deno.com/runtime/getting_started/installation/) and [Git](https://git-scm.com/downloads).
 
-## The gates
+```sh
+git clone https://github.com/rtlieu-cyber/d3_cmpm121.git
+cd d3_cmpm121
+deno task setup
+deno task dev
+```
 
-The commit hook and the GitHub Pages workflow both run `deno task ci`. See each gate fail on purpose, then undo the change:
+Open the local address printed in your terminal. To choose a reproducible world, append a seed to the URL:
 
-| Gate        | Try this                                                                                                                                          | What you should see                                                                            |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| Formatting  | Add extra spaces inside a line in `core/rules.ts`                                                                                                 | `deno fmt --check` reports the difference                                                      |
-| Lint        | Add `const unused = 1;` to `core/rules.ts`                                                                                                        | `deno lint` reports `no-unused-vars`                                                           |
-| Types       | Add `document.title = "core";` to `core/rules.ts`                                                                                                 | `deno check core` cannot find `document`                                                       |
-| Tests       | In `move` in `core/rules.ts`, add `state.player = to;` to the start of the blocked branch                                                         | The blocked-move test fails and shows the difference                                           |
-| Determinism | Use `Math.random()` in `terrainAt` in `core/terrain.ts`, or add `movedAt?: number` to `GameState` and set `state.movedAt = Date.now();` in `move` | The terrain test fails, or the replay test does                                                |
-| Boundary    | Add `import type _Phaser from "npm:phaser@4.2.1";` to `core/rules.ts`                                                                             | `deno task boundary` names the file and the import. Only this gate catches it.                 |
-| Boundary 2  | Add `import Phaser from "phaser"; console.log(Phaser);` to `game/hud.ts`                                                                          | `deno task boundary` says Phaser is mentioned outside `game/grid/`. Only this gate catches it. |
-| Build       | Change `/game/main.ts` in `index.html` to a missing file                                                                                          | `deno task build` cannot resolve it                                                            |
+```text
+?seed=121
+```
 
-## If blocked
+For example, if Vite prints `http://localhost:5173/`, use `http://localhost:5173/?seed=121`. The port may differ.
 
-Read the first failing command in the output, fix what it reports, and rerun `deno task ci`. If a hook or tool stalls you, ask course staff with the failing command and its error text.
+## Project structure and architecture
 
-## Credits
+```text
+core/
+  rules.ts              Game state, commands, events, gathering, crafting, victory
+  terrain.ts            Seeded terrain, yields, and movement barriers
+  recipes.ts            Data-driven crafting blueprints and final capstone
+  can_reach.ts          Crafting-chain reachability analysis
+  mod.ts                Public core API
+  *_test.ts             Unit, content, ending, and determinism tests
+  run.json              Recorded complete playthrough (seed 121)
+  replay_test.ts        Full-game replay and deterministic outcome tests
 
-Tooling adapted from the [CMPM 121 Fall 2026 D2 starter](https://github.com/ucsc-cmpm-121-f26/d2-starter), with the Phaser setup following the instructor's E4 starter. Those repositories have no explicit repository license; no new license is assigned to that material. The D3 scaffold was instructor-directed and authored with Anthropic Claude agent assistance. Dependencies retain their respective licenses.
+game/
+  main.ts               Wires together game systems
+  controller.ts         Keyboard input, command queue, command recording
+  presenter.ts          Plays events in sequence
+  grid/grid_view.ts     Phaser-based terrain and player display
+  hud.ts                Inventory, status, event log, victory presentation
+  recipe_book.ts        Crafting button presentation
+  sounds.ts             Web Audio feedback
+  style.css             Arcade console, HUD, and victory banner
 
-## Review bot
+index.html               Game layout and victory overlay
+TESTING.md               Manual test plan and bug-promotion procedure
+README.md                Project documentation
+```
 
-On every push to `main`, a review bot can comment on your commit. It's optional practice feedback, and it can be wrong, so weigh what it says. Until you set it up or opt out, the Review Bot workflow shows a red X and comments on every push. That X is about the bot: check the Deploy workflow separately to see whether your own checks passed.
+The design deliberately separates **game rules from presentation**:
 
-[The workflow](.github/workflows/review-bot.yml) is the whole bot, and the top of that file explains how to set it up or opt out. [`REVIEWBOT.md`](REVIEWBOT.md) tells it what to look for, and it's yours to change.
+- **Core (`core/`)** contains deterministic rules and plain-data state. `apply(state, command)` updates the state immediately and returns events. The core does not depend on the browser, game client, or Phaser.
+- **Client (`game/`)** receives player commands, queues and presents events, and displays the current experience. Only `game/grid/` imports Phaser; the HUD and crafting UI are ordinary HTML/CSS.
+- **Event order** matters: the core may update immediately, but the presenter plays visual and audio feedback in order so that the HUD does not show future events before animations finish.
 
-Its comments are public if your repository is. It runs on a throwaway machine with your code, can browse the web, and spends your own BayLeaf allowance.
+Relevant patterns include **Command**, **Domain Event**, **Event Queue**, **Observer**, **Mediator**, **Facade**, **Humble Object**, and **Hexagonal Architecture**. Recipes and terrain definitions are data-driven rather than separate classes for each item or biome.
+
+### How to add a crafting recipe
+
+1. Open [`core/recipes.ts`](core/recipes.ts).
+2. Add a new object to the `blueprints` array, following the existing `Recipe` type:
+
+   ```ts
+   {
+     output: "example device",
+     ingredients: { "scrap metal": 1, "biofiber": 1 },
+   }
+   ```
+
+3. Make sure each ingredient is obtainable through terrain yields or an earlier recipe. If introducing a new gatherable resource, update the terrain data in `core/terrain.ts` as well.
+4. Run `deno task test` and check the reachability/content tests. Run `deno task ci` before committing.
+
+The crafting UI reads the blueprint list, so adding a valid recipe to the table also adds its crafting button.
+
+## Testing and reproducibility
+
+Automated tests run the **core without a browser**. The repository contains tests for movement and barriers, gathering, recipes, reachability, the game ending, determinism, and a recorded complete playthrough.
+
+The recorded run in [`core/run.json`](core/run.json) uses **seed 121** and contains **52 commands**: 31 moves, 15 gathering commands, and 6 crafting commands. [`core/replay_test.ts`](core/replay_test.ts) applies those commands to a fresh game, checks for victory, and compares repeated runs for identical states and events.
+
+```sh
+deno task test       # Core tests, including the full-game replay
+deno task ci         # Formatting, lint, types, tests, boundary, build
+```
+
+For browser-level verification, follow [`TESTING.md`](TESTING.md). It covers navigation, UI, gathering, crafting, barriers, audio, victory, and the required **red/green regression-test** process. Manual tests are performed by a person; they are not included in `deno task ci`.
+
+Useful browser developer-console commands:
+
+```js
+game.state; // Current logical state
+game.controller.recorded.length; // Number of commands used so far
+game.state.endgame; // true after Rescue Beacon is crafted
+```
+
+To copy the currently recorded commands from Chrome/Edge developer tools:
+
+```js
+copy(JSON.stringify({
+  seed: game.state.seed,
+  commands: game.controller.recorded,
+}));
+```
+
+### Development commands
+
+| Command              | Purpose                                      |
+| -------------------- | -------------------------------------------- |
+| `deno task setup`    | Install dependencies and configure Git hooks |
+| `deno task dev`      | Start the local development server           |
+| `deno task fmt`      | Format files                                 |
+| `deno task lint`     | Run lint checks                              |
+| `deno task check`    | Type-check the project                       |
+| `deno task test`     | Run core tests                               |
+| `deno task boundary` | Verify core/client import boundaries         |
+| `deno task build`    | Build the production site                    |
+| `deno task preview`  | Preview the production build                 |
+| `deno task ci`       | Run all required automated checks            |
+
+## Team contributions
+
+This project was developed collaboratively for **UCSC CMPM 121 D3**.
+
+- **Weichen Sun (Allen):** Alien Frontier visual theme, arcade-console and HUD layout, progression planning, victory banner/presentation, command recording, full-game replay/testing contributions, and documentation.
+- **Teammate(s):** Core gathering and crafting systems, recipe/terrain modeling, barrier and reachability implementation, and supporting tests.
+
+Contributions evolved during development; the Git commit history provides the authoritative breakdown of changes and authorship.
+
+## Credits and acknowledgements
+
+The project builds on the instructor-provided CMPM 121 D3 starter. Its tooling was adapted from the [CMPM 121 Fall 2026 D2 starter](https://github.com/ucsc-cmpm-121-f26/d2-starter), and the Phaser setup follows the instructor's E4 starter. The original scaffold README noted instructor-directed development with Anthropic Claude agent assistance. Original dependencies retain their respective licenses; this README does not assign a new license to the starter material.
