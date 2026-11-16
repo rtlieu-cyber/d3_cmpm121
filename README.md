@@ -197,7 +197,7 @@ copy(JSON.stringify({
 This project was developed collaboratively for **UCSC CMPM 121 D3**.
 
 - **Weichen Sun (Allen):** Alien Frontier visual theme, arcade-console and HUD layout, progression planning, victory banner/presentation, command recording, full-game replay/testing contributions, and documentation.
-- **Teammate(s):** Core gathering and crafting systems, recipe/terrain modeling, barrier and reachability implementation, and supporting tests.
+- **Rayden Lieu:** Core gathering and crafting systems, recipe/terrain modeling, barrier and reachability implementation, and supporting tests.
 
 Contributions evolved during development; the Git commit history provides the authoritative breakdown of changes and authorship.
 
