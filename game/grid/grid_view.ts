@@ -38,6 +38,7 @@ export class GridView extends Phaser.Scene {
   private readonly start: Cell;
   private ground!: Phaser.GameObjects.Graphics;
   private marker!: Phaser.GameObjects.Arc;
+  private gatheredCells: Cell[] = [];
 
   constructor(state: GameState) {
     super("grid");
@@ -83,6 +84,8 @@ export class GridView extends Phaser.Scene {
       case "blocked":
         return this.bump(event.at, event.toward);
       case "gathered":
+        this.gatheredCells.push({ ...event.at });
+        this.drawCellsAround(event.at);
         return Promise.resolve();
       default:
         // A new event type fails to type-check here until it has a presentation.
@@ -128,7 +131,14 @@ export class GridView extends Phaser.Scene {
     this.ground.clear();
     for (let y = centerY - CELLS_DOWN; y <= centerY + CELLS_DOWN; y++) {
       for (let x = centerX - CELLS_ACROSS; x <= centerX + CELLS_ACROSS; x++) {
-        this.ground.fillStyle(TERRAIN_COLORS[terrainAt(this.seed, x, y)]);
+        const isDepleted = this.gatheredCells.some((cell) =>
+          cell.x === x && cell.y === y
+        );
+        if (isDepleted) {
+          this.ground.fillStyle(0x333333);
+        } else {
+          this.ground.fillStyle(TERRAIN_COLORS[terrainAt(this.seed, x, y)]);
+        }
         this.ground.fillRect(
           x * CELL_SIZE,
           y * CELL_SIZE,

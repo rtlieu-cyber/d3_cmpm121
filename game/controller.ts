@@ -38,6 +38,8 @@ export class Controller {
 
   private keyDown(event: KeyboardEvent) {
     const direction = ARROWS[event.key];
+    const gather = event.key.toLowerCase() === "e";
+    if (gather) this.next();
     if (!direction || event.ctrlKey || event.metaKey || event.altKey) return;
     // Otherwise arrow keys would also scroll the page.
     event.preventDefault();
