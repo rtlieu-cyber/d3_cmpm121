@@ -6,6 +6,7 @@
 import { isPassable, type Terrain, terrainAt } from "./terrain.ts";
 // import { tokenize } from "jsr:@std/internal@^1.0.12/diff-str";
 import { possible_mats } from "./terrain.ts";
+import { type Recipe } from "./recipes.ts";
 
 export type Cell = { x: number; y: number };
 
@@ -23,7 +24,7 @@ export type GameState = {
 // Command: https://gameprogrammingpatterns.com/command.html
 export type Command = { type: "move"; direction: Direction } | {
   type: "gather";
-};
+} | { type: "craft"; recipe: Recipe };
 
 // Domain Event: https://martinfowler.com/eaaDev/DomainEvent.html
 export type GameEvent =
@@ -35,6 +36,12 @@ export type GameEvent =
     terrain: Terrain;
     item: string;
     inventory: Record<string, number>;
+  }
+  | { type: "craftedSuccess"; inventory: Record<string, number> }
+  | {
+    type: "craftedFailure";
+    inventory: Record<string, number>;
+    missing: Record<string, number>;
   };
 
 const STEPS: Record<Direction, Cell> = {
@@ -56,6 +63,8 @@ export function apply(state: GameState, command: Command): GameEvent[] {
       return move(state, command.direction);
     case "gather":
       return gather(state);
+    case "craft":
+      return craft(state, command.recipe);
   }
 }
 
@@ -97,4 +106,36 @@ function gather(state: GameState): GameEvent[] {
     }
   }
   return [];
+}
+
+function craft(state: GameState, recipe: Recipe): GameEvent[] {
+  const checkIngredients = checkRecipe(state, recipe);
+  if (Object.keys(checkIngredients).length === 0) {
+    for (const [item, required] of Object.entries(recipe.ingredients)) {
+      state.inventory[item] = state.inventory[item] - required;
+    }
+    state.inventory[recipe.output] = (state.inventory[recipe.output] ?? 0) + 1;
+    return [{
+      type: "craftedSuccess",
+      inventory: { ...state.inventory },
+    }];
+  } else {
+    return [{
+      type: "craftedFailure",
+      inventory: { ...state.inventory },
+      missing: checkIngredients,
+    }];
+  }
+}
+
+function checkRecipe(state: GameState, recipe: Recipe) {
+  const missing: Record<string, number> = {};
+  for (const [item, required] of Object.entries(recipe.ingredients)) {
+    const owned = state.inventory[item] ?? 0;
+    const difference = Math.max(0, required - owned);
+    if (difference > 0) {
+      missing[item] = difference;
+    }
+  }
+  return missing;
 }

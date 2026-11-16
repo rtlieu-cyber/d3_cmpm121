@@ -22,9 +22,9 @@ export function isPassable(terrain: Terrain): boolean {
 }
 
 export const possible_mats: Record<Terrain, string | null> = {
-  "scrap flats": "Scrap Metal",
-  "fungal grove": "Biofiber",
-  "toxic marsh": "Ion Crystals",
+  "scrap flats": "scrap metal",
+  "fungal grove": "biofiber",
+  "toxic marsh": "ion crystal",
   "basalt cliffs": null,
 };
 
