@@ -37,10 +37,15 @@ export type GameEvent =
     item: string;
     inventory: Record<string, number>;
   }
-  | { type: "craftedSuccess"; inventory: Record<string, number> }
+  | {
+    type: "craftedSuccess";
+    inventory: Record<string, number>;
+    output: string;
+  }
   | {
     type: "craftedFailure";
     inventory: Record<string, number>;
+    output: string;
     missing: Record<string, number>;
   };
 
@@ -118,17 +123,19 @@ function craft(state: GameState, recipe: Recipe): GameEvent[] {
     return [{
       type: "craftedSuccess",
       inventory: { ...state.inventory },
+      output: recipe.output,
     }];
   } else {
     return [{
       type: "craftedFailure",
+      output: recipe.output,
       inventory: { ...state.inventory },
       missing: checkIngredients,
     }];
   }
 }
 
-function checkRecipe(state: GameState, recipe: Recipe) {
+export function checkRecipe(state: GameState, recipe: Recipe) {
   const missing: Record<string, number> = {};
   for (const [item, required] of Object.entries(recipe.ingredients)) {
     const owned = state.inventory[item] ?? 0;

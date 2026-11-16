@@ -78,4 +78,9 @@ export class Controller {
     const events = apply(this.state, command);
     if (events.length > 0) this.presenter.play(events);
   }
+
+  public send(command: Command) {
+    this.pressed = command;
+    this.next();
+  }
 }

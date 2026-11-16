@@ -14,9 +14,13 @@ function describe(event: GameEvent): string {
     case "gathered":
       return `gathered ${event.item} from ${event.terrain}`;
     case "craftedSuccess":
-      return `successfully crafted`;
+      return `successfully crafted ${event.output}`;
     case "craftedFailure":
-      return `failed to craft, missing items`;
+      return `failed to craft ${event.output}, missing ${
+        Object.entries(event.missing).map(([item, count]) =>
+          `${item}: ${count}`
+        ).join(", ")
+      }`;
   }
 }
 
@@ -37,6 +41,16 @@ export class Hud {
     if (event.type === "gathered") {
       this.gatheredCells.push({ ...event.at });
       this.showPosition(event.at.x, event.at.y);
+      const inventoryList = element("inventory");
+      inventoryList?.replaceChildren();
+      Object.entries(event.inventory).forEach(([item, count]) => {
+        const inventory_element = document.createElement("li");
+        inventory_element.textContent = `${item}: ${count}`;
+        inventoryList.append(inventory_element);
+      });
+    }
+
+    if (event.type === "craftedSuccess") {
       const inventoryList = element("inventory");
       inventoryList?.replaceChildren();
       Object.entries(event.inventory).forEach(([item, count]) => {

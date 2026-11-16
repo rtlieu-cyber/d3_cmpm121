@@ -3,6 +3,7 @@ import { Controller } from "./controller.ts";
 import { startGridView } from "./grid/grid_view.ts";
 import { Hud } from "./hud.ts";
 import { Presenter } from "./presenter.ts";
+import { RecipeBook } from "./recipe_book.ts";
 import { Sounds } from "./sounds.ts";
 
 // Where everything is wired together, and the only file that knows every part.
@@ -17,9 +18,19 @@ const hud = new Hud(state);
 const sounds = new Sounds(
   document.getElementById("mute") as HTMLButtonElement,
 );
+const recipeList = document.getElementById("recipes");
+if (!(recipeList instanceof HTMLUListElement)) {
+  throw new Error();
+}
 const grid = await startGridView(document.getElementById("grid")!, state);
 const presenter = new Presenter([grid, hud, sounds]);
 const controller = new Controller(state, presenter);
+const recipebook = new RecipeBook(
+  recipeList,
+  state,
+  (command) => controller.send(command),
+);
+controller.onSettled = () => recipebook.buttonCheck();
 
 // For poking at in the browser console, such as comparing logical state with
 // presentation state: game.state
