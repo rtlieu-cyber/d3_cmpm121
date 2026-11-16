@@ -28,7 +28,8 @@ export type Command = { type: "move"; direction: Direction } | {
 // Domain Event: https://martinfowler.com/eaaDev/DomainEvent.html
 export type GameEvent =
   | { type: "moved"; from: Cell; to: Cell }
-  | { type: "blocked"; at: Cell; toward: Cell; terrain: Terrain };
+  | { type: "blocked"; at: Cell; toward: Cell; terrain: Terrain }
+  | { type: "gathered"; at: Cell; terrain: Terrain; item: string };
 
 const STEPS: Record<Direction, Cell> = {
   north: { x: 0, y: -1 },
