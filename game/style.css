@@ -1,83 +1,678 @@
-/* The page around the grid. Everything here is yours to restyle. */
+/* =========================================================
+   D3 — ALIEN FRONTIER
+   Sci-Fi Survival / Exploration Interface
+   ========================================================= */
+
+/* -------------------------
+   Design Tokens
+   ------------------------- */
+
+:root {
+  color-scheme: dark;
+
+  /* Backgrounds */
+  --bg-deep: #070d16;
+  --bg-main: #0b1420;
+  --bg-panel: #101e2d;
+  --bg-panel-light: #15283a;
+  --bg-hover: #1b3447;
+
+  /* Accent Colors */
+  --cyan: #4deaff;
+  --cyan-dim: #279aac;
+  --orange: #ffaf57;
+  --green: #7dffbc;
+  --red: #ff657c;
+
+  /* Typography */
+  --text-main: #e7f6ff;
+  --text-muted: #829bad;
+  --text-faint: #506879;
+
+  /* Borders */
+  --border-main: rgb(77 234 255 / 20%);
+  --border-bright: rgb(77 234 255 / 55%);
+
+  /* Effects */
+  --glow-cyan: 0 0 15px rgb(77 234 255 / 15%);
+  --glow-orange: 0 0 15px rgb(255 175 87 / 15%);
+  --panel-shadow: 0 12px 40px rgb(0 0 0 / 35%);
+
+  /* Layout */
+  --radius: 8px;
+  --panel-gap: 20px;
+  --hud-width: 310px;
+
+  /* Fonts */
+  --font-ui: "Segoe UI", Arial, sans-serif;
+  --font-data: "Consolas", "Courier New", monospace;
+}
+
+/* -------------------------
+   Global Reset
+   ------------------------- */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--bg-deep);
+}
+
 body {
   margin: 0;
-  background: #14161a;
-  color: #e8e4da;
-  font: 14px system-ui, sans-serif;
+  min-height: 100vh;
+
+  color: var(--text-main);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.5;
+
+  background:
+    radial-gradient(
+    ellipse at 50% -10%,
+    rgb(24 73 104 / 35%),
+    transparent 55%
+  ),
+    radial-gradient(
+    ellipse at 100% 100%,
+    rgb(12 64 78 / 20%),
+    transparent 50%
+  ),
+    var(--bg-deep);
 }
+
+/* Subtle sci-fi grid background */
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+
+  background-image:
+    linear-gradient(
+    rgb(77 234 255 / 3%) 1px,
+    transparent 1px
+  ),
+    linear-gradient(
+    90deg,
+    rgb(77 234 255 / 3%) 1px,
+    transparent 1px
+  );
+
+  background-size: 48px 48px;
+}
+
+/* -------------------------
+   Main Game Layout
+   ------------------------- */
 
 #app {
   display: flex;
+  align-items: flex-start;
+  justify-content: center;
   flex-wrap: wrap;
-  gap: 16px;
-  padding: 16px;
+
+  gap: var(--panel-gap);
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 32px 20px;
+}
+
+/* -------------------------
+   World / Grid
+   ------------------------- */
+
+#grid {
+  position: relative;
+  flex: 0 0 auto;
+
+  padding: 8px;
+  border: 1px solid var(--border-main);
+  border-radius: var(--radius);
+
+  background: var(--bg-main);
+  box-shadow:
+    var(--panel-shadow),
+    var(--glow-cyan);
+
+  perspective: 1200px;
+}
+
+/* Decorative frame corners */
+
+#grid::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+
+  border: 2px solid transparent;
+  border-top-color: var(--cyan);
+  border-left-color: var(--cyan);
+
+  border-radius: var(--radius);
+  clip-path: polygon(
+    0 0,
+    45px 0,
+    45px 3px,
+    3px 3px,
+    3px 45px,
+    0 45px
+  );
+
+  pointer-events: none;
+  z-index: 2;
 }
 
 #grid canvas {
   display: block;
+  max-width: 100%;
   border-radius: 4px;
-}
 
-#hud {
-  flex: 1 1 200px;
-  max-width: 320px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-#hud dl {
-  margin: 0;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 2px 12px;
-}
-
-#hud dt {
-  color: #8d8a82;
-}
-
-#hud dd {
-  margin: 0;
-}
-
-#live {
-  min-height: 1.4em;
-  margin: 0;
-  font-family: monospace;
-  color: #b7b3a8;
-}
-
-#mute {
-  align-self: start;
-  padding: 4px 10px;
-  color: inherit;
-  background: #262a31;
-  border: 1px solid #3a3f48;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-/* Slight tilt and vignette: pure presentation, Phaser untouched. */
-#grid {
-  position: relative;
-  perspective: 1200px;
-}
-
-#grid canvas,
-#grid::after {
   transform: rotateX(6deg);
 }
+
+/* Cinematic dark edges */
 
 #grid::after {
   content: "";
   position: absolute;
-  inset: 0;
+  inset: 8px;
+
   pointer-events: none;
   border-radius: 4px;
+
+  transform: rotateX(6deg);
+
   background: radial-gradient(
     ellipse at center,
     transparent 55%,
-    rgb(0 0 0 / 0.5) 100%
+    rgb(0 0 0 / 45%) 100%
   );
+}
+
+/* -------------------------
+   HUD Sidebar
+   ------------------------- */
+
+#hud {
+  position: relative;
+
+  flex: 1 1 var(--hud-width);
+  width: var(--hud-width);
+  max-width: 360px;
+  min-width: 260px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  padding: 24px;
+
+  background:
+    linear-gradient(
+    145deg,
+    rgb(21 40 58 / 98%),
+    rgb(10 20 32 / 98%)
+  );
+
+  border: 1px solid var(--border-main);
+  border-top: 3px solid var(--cyan);
+  border-radius: var(--radius);
+
+  box-shadow:
+    var(--panel-shadow),
+    var(--glow-cyan);
+}
+
+/* HUD header label */
+
+#hud::before {
+  content: "EXPLORER STATUS";
+  display: block;
+
+  color: var(--cyan);
+  font-family: var(--font-data);
+  font-size: 12px;
+  font-weight: 700;
+
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-main);
+}
+
+/* -------------------------
+   Status Readouts
+   ------------------------- */
+
+#hud dl {
+  margin: 0;
+
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px 12px;
+  align-items: center;
+}
+
+#hud dt {
+  color: var(--text-muted);
+
+  font-family: var(--font-data);
+  font-size: 11px;
+  font-weight: 600;
+
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+#hud dd {
+  margin: 0;
+  text-align: right;
+
+  font-family: var(--font-data);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+/* Coordinates */
+
+#position {
+  color: var(--cyan) !important;
+  text-shadow: 0 0 12px rgb(77 234 255 / 25%);
+}
+
+/* Current terrain */
+
+#terrain {
+  color: var(--orange) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* -------------------------
+   Event Log
+   ------------------------- */
+
+#live {
+  position: relative;
+  margin: 0;
+
+  min-height: 62px;
+  padding: 14px;
+
+  background: rgb(4 12 20 / 65%);
+
+  border: 1px solid var(--border-main);
+  border-left: 3px solid var(--green);
+  border-radius: 4px;
+
+  color: var(--green);
+  font-family: var(--font-data);
+  font-size: 12px;
+  line-height: 1.6;
+
+  overflow-wrap: anywhere;
+}
+
+#live::before {
+  content: "SYSTEM LOG";
+  display: block;
+  margin-bottom: 6px;
+
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 0.15em;
+}
+
+/* -------------------------
+   Buttons
+   ------------------------- */
+
+button {
+  font-family: var(--font-data);
+  font-size: 12px;
+  font-weight: 700;
+
+  letter-spacing: 0.06em;
+
+  padding: 11px 16px;
+
+  color: var(--cyan);
+
+  background:
+    linear-gradient(
+    180deg,
+    var(--bg-panel-light),
+    var(--bg-panel)
+  );
+
+  border: 1px solid var(--border-bright);
+  border-radius: 4px;
+
+  cursor: pointer;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    transform 150ms ease;
+}
+
+button:hover {
+  background: var(--bg-hover);
+  border-color: var(--cyan);
+  box-shadow: var(--glow-cyan);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 3px;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Audio toggle */
+
+#mute {
+  align-self: stretch;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+#mute[aria-pressed="true"] {
+  color: var(--text-muted);
+  border-color: var(--text-faint);
+  box-shadow: none;
+}
+
+/* -------------------------
+   Future Inventory Panel
+   ------------------------- */
+
+#inventory-panel,
+.inventory-panel {
+  padding: 18px;
+
+  background: var(--bg-panel);
+
+  border: 1px solid var(--border-main);
+  border-radius: var(--radius);
+}
+
+#inventory-panel h2,
+.inventory-panel h2 {
+  margin: 0 0 14px;
+
+  color: var(--cyan);
+  font-family: var(--font-data);
+  font-size: 13px;
+
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+#inventory,
+.inventory-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  display: grid;
+  gap: 8px;
+}
+
+#inventory li,
+.inventory-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 10px 12px;
+
+  background: var(--bg-panel-light);
+  border: 1px solid var(--border-main);
+  border-radius: 4px;
+
+  color: var(--text-main);
+  font-family: var(--font-data);
+  font-size: 12px;
+}
+
+.item-count,
+.inventory-count {
+  color: var(--orange);
+  font-weight: 700;
+}
+
+/* -------------------------
+   Future Crafting Panel
+   ------------------------- */
+
+#crafting-panel,
+.crafting-panel {
+  padding: 18px;
+
+  background: var(--bg-panel);
+
+  border: 1px solid var(--border-main);
+  border-radius: var(--radius);
+}
+
+#crafting-panel h2,
+.crafting-panel h2 {
+  margin: 0 0 14px;
+
+  color: var(--orange);
+  font-family: var(--font-data);
+  font-size: 13px;
+
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+#recipes,
+.recipe-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#recipes li,
+.recipe-list li {
+  padding: 10px;
+
+  background: var(--bg-panel-light);
+  border: 1px solid var(--border-main);
+  border-radius: 4px;
+}
+
+#recipes button,
+.recipe-button {
+  width: 100%;
+  text-align: left;
+}
+
+.recipe-name {
+  color: var(--cyan);
+  font-weight: 700;
+}
+
+.recipe-cost,
+.recipe-requirements {
+  color: var(--text-muted);
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.recipe-missing {
+  color: var(--red);
+}
+
+.recipe-ready {
+  color: var(--green);
+}
+
+/* -------------------------
+   Goal / Progression
+   ------------------------- */
+
+#goal,
+.goal-panel {
+  padding: 14px;
+
+  background: rgb(255 175 87 / 6%);
+  border: 1px solid rgb(255 175 87 / 30%);
+  border-left: 3px solid var(--orange);
+  border-radius: 4px;
+
+  color: var(--text-main);
+  font-family: var(--font-data);
+  font-size: 12px;
+}
+
+#goal strong,
+.goal-panel strong {
+  color: var(--orange);
+}
+
+/* Victory banner */
+
+#win-banner,
+.win-banner {
+  padding: 20px;
+
+  text-align: center;
+  color: var(--green);
+
+  background: var(--bg-panel);
+  border: 2px solid var(--green);
+  border-radius: var(--radius);
+
+  box-shadow: 0 0 30px rgb(125 255 188 / 15%);
+
+  font-family: var(--font-data);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+/* Preserve native hidden behavior */
+
+[hidden] {
+  display: none !important;
+}
+
+/* -------------------------
+   Scrollbars
+   ------------------------- */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-deep);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--cyan-dim);
+  border-radius: 4px;
+}
+
+/* -------------------------
+   Responsive Layout
+   ------------------------- */
+
+@media (max-width: 1180px) {
+  #app {
+    justify-content: center;
+  }
+
+  #hud {
+    max-width: 800px;
+    width: 100%;
+    flex-basis: 100%;
+  }
+}
+
+@media (max-width: 860px) {
+  #app {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  #grid {
+    max-width: 100%;
+    overflow: auto;
+  }
+
+  #grid canvas {
+    transform: none;
+  }
+
+  #grid::after {
+    transform: none;
+  }
+
+  #hud {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 13px;
+  }
+
+  #app {
+    padding: 10px;
+  }
+
+  #hud {
+    min-width: 0;
+    padding: 14px;
+    gap: 12px;
+  }
+
+  #hud dl {
+    gap: 10px;
+  }
+
+  button {
+    min-height: 44px;
+  }
+}
+
+/* -------------------------
+   Reduced Motion
+   ------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  button {
+    transition: none;
+  }
+
+  #grid canvas,
+  #grid::after {
+    transform: none;
+  }
 }
