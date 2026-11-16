@@ -3,66 +3,126 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>D3 project</title>
+    <title>Alien Frontier — Explorer Console</title>
     <link rel="icon" href="data:," />
     <link rel="stylesheet" href="/game/style.css" />
   </head>
   <body>
-    <main id="app">
-      <div id="grid"></div>
+    <main id="app" class="console">
+      <header class="console-header">
+        <div class="console-brand">
+          <span class="power-light" aria-hidden="true"></span>
+          <div class="brand-copy">
+            <span class="brand-name">AF-01</span>
+            <span class="brand-subtitle">EXPLORATION SYSTEM</span>
+          </div>
+        </div>
+        <div class="console-title">
+          ALIEN FRONTIER
+          <span>FIELD EXPLORATION CONSOLE</span>
+        </div>
+        <div class="console-model">MODEL / 121</div>
+      </header>
 
-      <aside id="hud">
-        <section class="status-panel">
-          <h2>EXPLORER STATUS</h2>
-          <dl>
-            <dt>Position</dt>
-            <dd id="position"></dd>
-
-            <dt>Terrain</dt>
-            <dd id="terrain"></dd>
-          </dl>
+      <div class="console-content">
+        <section class="screen-module" aria-label="Game display">
+          <div class="screen-label">
+            <span><i class="signal-light" aria-hidden="true"></i> DISPLAY ACTIVE</span>
+            <span>WORLD EXPLORER / 800 × 600</span>
+          </div>
+          <div id="grid"></div>
+          <div class="screen-footer">
+            <span>WORLD NAVIGATION</span>
+            <span>ARROW KEYS TO MOVE</span>
+          </div>
         </section>
 
-        <section id="inventory-panel">
-          <h2>INVENTORY</h2>
-          <ul id="inventory">
-            <li>
-              <span>No materials collected</span>
-            </li>
-          </ul>
-        </section>
+        <aside id="hud" aria-label="Explorer terminal">
+          <!-- This header stays in place while the cards scroll. -->
+          <div class="hud-header">
+            <p class="hud-kicker">Alien Frontier</p>
+            <h1>Explorer Terminal</h1>
+            <p class="hud-subtitle">Field status and survival systems</p>
+          </div>
 
-        <section id="crafting-panel">
-          <h2>CRAFTING STATION</h2>
-          <ul id="recipes">
-            <li>
-              <span class="recipe-missing">
-          No blueprints available
-        </span>
-            </li>
-          </ul>
-        </section>
+          <!-- Only this middle area scrolls. -->
+          <div class="hud-scroll">
+            <section class="hud-card hud-card-status">
+              <div class="card-title-row">
+                <h2>Status</h2>
+                <span class="status-pill">ONLINE</span>
+              </div>
+              <div class="status-grid">
+                <div class="status-item">
+                  <span class="status-label">Position</span>
+                  <span class="status-value" id="position">--, --</span>
+                </div>
+                <div class="status-item">
+                  <span class="status-label">Terrain</span>
+                  <span class="status-value terrain-value"
+                    id="terrain">Unknown</span>
+                </div>
+              </div>
+            </section>
 
-        <section id="goal">
-          <strong>MISSION OBJECTIVE</strong>
-          <p id="objective-text">
-      Gather resources, craft survival equipment,
-      and find a way off the planet.
-    </p>
-        </section>
+            <section class="hud-card" id="inventory-panel">
+              <div class="card-title-row">
+                <h2>Inventory</h2>
+                <span class="card-tag">Resources</span>
+              </div>
+              <ul id="inventory" class="data-list">
+                <li class="empty-state">No materials collected yet</li>
+              </ul>
+            </section>
 
-        <section id="system-panel">
-          <h2>SYSTEM LOG</h2>
-          <p id="live" aria-live="polite"></p>
-        </section>
+            <section class="hud-card" id="crafting-panel">
+              <div class="card-title-row">
+                <h2>Crafting</h2>
+                <span class="card-tag">Blueprints</span>
+              </div>
+              <ul id="recipes" class="data-list">
+                <li class="empty-state">No recipes available yet</li>
+              </ul>
+            </section>
 
-        <section id="controls">
-          <button id="mute" type="button"
-            aria-pressed="false">
-      Sound: on
-    </button>
-        </section>
-      </aside>
+            <section class="hud-card hud-card-goal" id="goal">
+              <div class="card-title-row">
+                <h2>Objective</h2>
+                <span class="card-tag mission-tag">Mission</span>
+              </div>
+              <p id="objective-text">
+                Gather resources, unlock new areas, and build what you need to survive.
+              </p>
+            </section>
+
+            <section class="hud-card hud-card-log">
+              <div class="card-title-row">
+                <h2>System Log</h2>
+                <span class="card-tag">Live</span>
+              </div>
+              <p id="live" aria-live="polite">Awaiting activity...</p>
+            </section>
+          </div>
+
+          <!-- This button also stays fixed while the cards scroll. -->
+          <div class="hud-controls">
+            <button id="mute" type="button"
+              aria-pressed="false">Sound: On</button>
+          </div>
+        </aside>
+      </div>
+
+      <footer class="console-footer">
+        <div class="speaker-grille" aria-hidden="true"></div>
+        <div class="control-legend">
+          <span class="control-key">↑ ↓ ← →</span>
+          <span>NAVIGATE</span>
+          <span class="control-separator">/</span>
+          <span>EXPLORATION MODE</span>
+        </div>
+        <span class="console-serial">AF-01 / REV. 2026</span>
+        <div class="speaker-grille" aria-hidden="true"></div>
+      </footer>
     </main>
     <script type="module" src="/game/main.ts"></script>
   </body>
