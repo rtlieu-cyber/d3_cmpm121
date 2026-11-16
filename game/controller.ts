@@ -39,14 +39,21 @@ export class Controller {
   private keyDown(event: KeyboardEvent) {
     const direction = ARROWS[event.key];
     const gather = event.key.toLowerCase() === "e";
-    if (gather) this.next();
-    if (!direction || event.ctrlKey || event.metaKey || event.altKey) return;
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
     // Otherwise arrow keys would also scroll the page.
-    event.preventDefault();
     if (event.repeat) return;
-    this.held.push(direction);
-    this.pressed = { type: "move", direction };
-    this.next();
+    if (gather) {
+      event.preventDefault();
+      this.pressed = { type: "gather" };
+      this.next();
+      return;
+    } else if (direction) {
+      event.preventDefault();
+      this.held.push(direction);
+      this.pressed = { type: "move", direction };
+      this.next();
+      return;
+    }
   }
 
   private keyUp(event: KeyboardEvent) {

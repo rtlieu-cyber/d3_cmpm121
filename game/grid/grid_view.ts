@@ -84,9 +84,7 @@ export class GridView extends Phaser.Scene {
       case "blocked":
         return this.bump(event.at, event.toward);
       case "gathered":
-        this.gatheredCells.push({ ...event.at });
-        this.drawCellsAround(event.at);
-        return Promise.resolve();
+        return this.take(event.at);
       default:
         // A new event type fails to type-check here until it has a presentation.
         event satisfies never;
@@ -119,6 +117,23 @@ export class GridView extends Phaser.Scene {
         yoyo: true,
         onComplete: () => {
           this.marker.setFillStyle(MARKER_COLOR);
+          done();
+        },
+      });
+    });
+  }
+
+  private take(at: Cell): Promise<void> {
+    this.gatheredCells.push({ ...at });
+    this.drawCellsAround(at);
+    return new Promise((done) => {
+      this.tweens.add({
+        targets: this.marker,
+        scale: 0.5,
+        ease: "Linear",
+        yoyo: true,
+        duration: BUMP_MS,
+        onComplete: () => {
           done();
         },
       });

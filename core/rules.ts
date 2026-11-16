@@ -29,7 +29,13 @@ export type Command = { type: "move"; direction: Direction } | {
 export type GameEvent =
   | { type: "moved"; from: Cell; to: Cell }
   | { type: "blocked"; at: Cell; toward: Cell; terrain: Terrain }
-  | { type: "gathered"; at: Cell; terrain: Terrain; item: string };
+  | {
+    type: "gathered";
+    at: Cell;
+    terrain: Terrain;
+    item: string;
+    inventory: Record<string, number>;
+  };
 
 const STEPS: Record<Direction, Cell> = {
   north: { x: 0, y: -1 },
@@ -70,19 +76,25 @@ function move(state: GameState, direction: Direction): GameEvent[] {
   return [{ type: "moved", from, to }];
 }
 
-function gather(state: GameState) {
+function gather(state: GameState): GameEvent[] {
   const terrain = terrainAt(state.seed, state.player.x, state.player.y);
+  const item = possible_mats[terrain];
   if (
     !state.changed_cells.some((cell) =>
       cell.x === state.player.x && cell.y === state.player.y
     )
   ) {
-    const item = possible_mats[terrain];
     if (item) {
       state.inventory[item] = (state.inventory[item] ?? 0) + 1;
       state.changed_cells.push({ ...state.player });
+      return [{
+        type: "gathered",
+        at: { ...state.player },
+        terrain: terrain,
+        item: item,
+        inventory: { ...state.inventory },
+      }];
     }
   }
-
   return [];
 }

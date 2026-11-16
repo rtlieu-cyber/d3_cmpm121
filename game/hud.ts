@@ -33,6 +33,13 @@ export class Hud {
     if (event.type === "gathered") {
       this.gatheredCells.push({ ...event.at });
       this.showPosition(event.at.x, event.at.y);
+      const inventoryList = element("inventory");
+      inventoryList?.replaceChildren();
+      Object.entries(event.inventory).forEach(([item, count]) => {
+        const inventory_element = document.createElement("li");
+        inventory_element.textContent = `${item}: ${count}`;
+        inventoryList.append(inventory_element);
+      });
     }
   }
 

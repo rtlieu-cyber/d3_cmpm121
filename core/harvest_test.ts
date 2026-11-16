@@ -1,4 +1,4 @@
-import { assertEquals, assertNotEquals } from "@std/assert";
+import { assert, assertEquals, assertNotEquals } from "@std/assert";
 import { apply, type GameState, isPassable, terrainAt } from "./mod.ts";
 import { possible_mats } from "./terrain.ts";
 import { searchForTerrain } from "./test_helpers.ts";
@@ -75,6 +75,20 @@ Deno.test("an event keeps its cells while state moves on", () => {
     from: { x: x + 1, y },
     to: { x, y },
   }]);
+});
+
+Deno.test("an event keeps its cells while state moves on, and there's harvesting", () => {
+  const state = besideEasternCell(true);
+  const { x, y } = state.player;
+
+  const firstGather = apply(state, { type: "gather" });
+  apply(state, { type: "move", direction: "east" });
+  apply(state, { type: "gather" });
+  const item = possible_mats[terrainAt(SEED, x, y)];
+  assertNotEquals(firstGather[0], null);
+  assert(firstGather[0]?.type === "gathered");
+  assert(item !== null);
+  assertEquals(firstGather[0].inventory, { [item]: 1 });
 });
 
 Deno.test("a harvestable terrain is harvested", () => {
