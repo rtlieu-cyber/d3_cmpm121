@@ -21,6 +21,13 @@ export function isPassable(terrain: Terrain): boolean {
   return terrain !== "toxic marsh" && terrain !== "basalt cliffs";
 }
 
+export const possible_mats: Record<Terrain, string | null> = {
+  "scrap flats": "Scrap Metal",
+  "fungal grove": "Biofiber",
+  "toxic marsh": "Ion Crystals",
+  "basalt cliffs": null,
+};
+
 // Value noise: random numbers at coarse grid points, blended between them, so
 // that terrain forms regions instead of static.
 function noise(seed: number, x: number, y: number, scale: number): number {
