@@ -1,21 +1,44 @@
 // The world is a pure function of a seed and coordinates. Nothing here is stored,
 // so the world can be effectively unbounded while saved state stays small.
 
-export type Terrain = "grass" | "forest" | "water" | "rock";
+export type Terrain =
+  | "scrap flats"
+  | "fungal grove"
+  | "toxic marsh"
+  | "basalt cliffs";
 
 export function terrainAt(seed: number, x: number, y: number): Terrain {
   const raw = 0.65 * noise(seed, x, y, 9) + 0.35 * noise(seed + 1, x, y, 3);
   // Every game starts at the origin, so flatten the land there. Otherwise some
   // seeds would start inside a lake or walled into a pocket.
   const height = 0.5 + (raw - 0.5) * Math.min(1, Math.hypot(x, y) / 10);
-  if (height < 0.3) return "water";
-  if (height > 0.7) return "rock";
-  return noise(seed + 2, x, y, 6) < 0.45 ? "forest" : "grass";
+  if (height < 0.3) return "toxic marsh";
+  if (height > 0.7) return "basalt cliffs";
+  return noise(seed + 2, x, y, 6) < 0.45 ? "scrap flats" : "fungal grove";
 }
 
-export function isPassable(terrain: Terrain): boolean {
-  return terrain !== "water" && terrain !== "rock";
+export function isPassable(
+  terrain: Terrain,
+  inventory: Record<string, number>,
+): boolean {
+  if (terrain === "basalt cliffs") return false;
+  const openItem = possible_mats[terrain].opensWith;
+  if (openItem === null) return true;
+  if ((inventory[openItem] ?? 0) > 0) {
+    return true;
+  }
+  return false;
 }
+
+export const possible_mats: Record<
+  Terrain,
+  { yields: string | null; opensWith: string | null }
+> = {
+  "scrap flats": { yields: "scrap metal", opensWith: null },
+  "fungal grove": { yields: "biofiber", opensWith: null },
+  "toxic marsh": { yields: "ion crystal", opensWith: "filter suit" },
+  "basalt cliffs": { yields: null, opensWith: null },
+};
 
 // Value noise: random numbers at coarse grid points, blended between them, so
 // that terrain forms regions instead of static.

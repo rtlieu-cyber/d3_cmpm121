@@ -38,13 +38,22 @@ export class Controller {
 
   private keyDown(event: KeyboardEvent) {
     const direction = ARROWS[event.key];
-    if (!direction || event.ctrlKey || event.metaKey || event.altKey) return;
+    const gather = event.key.toLowerCase() === "e";
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
     // Otherwise arrow keys would also scroll the page.
-    event.preventDefault();
     if (event.repeat) return;
-    this.held.push(direction);
-    this.pressed = { type: "move", direction };
-    this.next();
+    if (gather) {
+      event.preventDefault();
+      this.pressed = { type: "gather" };
+      this.next();
+      return;
+    } else if (direction) {
+      event.preventDefault();
+      this.held.push(direction);
+      this.pressed = { type: "move", direction };
+      this.next();
+      return;
+    }
   }
 
   private keyUp(event: KeyboardEvent) {
@@ -68,5 +77,10 @@ export class Controller {
     // here until the stack overflowed. No events means there is nothing to wait for.
     const events = apply(this.state, command);
     if (events.length > 0) this.presenter.play(events);
+  }
+
+  public send(command: Command) {
+    this.pressed = command;
+    this.next();
   }
 }

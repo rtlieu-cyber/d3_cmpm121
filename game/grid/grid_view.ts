@@ -13,10 +13,10 @@ const MARKER_COLOR = 0xf5e6a8;
 const BUMP_COLOR = 0xe0533d;
 
 const TERRAIN_COLORS: Record<Terrain, number> = {
-  grass: 0x5d9e4a,
-  forest: 0x2f6b3a,
-  water: 0x2d5f9e,
-  rock: 0x6e6a66,
+  "scrap flats": 0xb7410e,
+  "fungal grove": 0x658B38,
+  "toxic marsh": 0x4c00b0,
+  "basalt cliffs": 0x3e3a33,
 };
 
 // Enough cells to cover the view, plus a margin so that the camera can lag behind
@@ -38,6 +38,7 @@ export class GridView extends Phaser.Scene {
   private readonly start: Cell;
   private ground!: Phaser.GameObjects.Graphics;
   private marker!: Phaser.GameObjects.Arc;
+  private gatheredCells: Cell[] = [];
 
   constructor(state: GameState) {
     super("grid");
@@ -82,6 +83,14 @@ export class GridView extends Phaser.Scene {
         return this.walk(event.to);
       case "blocked":
         return this.bump(event.at, event.toward);
+      case "gathered":
+        return this.take(event.at);
+      case "craftedFailure":
+        return Promise.resolve();
+      case "craftedSuccess":
+        return Promise.resolve();
+      case "gameEnded":
+        return Promise.resolve();
       default:
         // A new event type fails to type-check here until it has a presentation.
         event satisfies never;
@@ -120,13 +129,37 @@ export class GridView extends Phaser.Scene {
     });
   }
 
+  private take(at: Cell): Promise<void> {
+    this.gatheredCells.push({ ...at });
+    this.drawCellsAround(at);
+    return new Promise((done) => {
+      this.tweens.add({
+        targets: this.marker,
+        scale: 0.5,
+        ease: "Linear",
+        yoyo: true,
+        duration: BUMP_MS,
+        onComplete: () => {
+          done();
+        },
+      });
+    });
+  }
+
   // Paint only what is near the camera. Asking the core again costs little, and
   // the world itself is never stored.
   private drawCellsAround({ x: centerX, y: centerY }: Cell) {
     this.ground.clear();
     for (let y = centerY - CELLS_DOWN; y <= centerY + CELLS_DOWN; y++) {
       for (let x = centerX - CELLS_ACROSS; x <= centerX + CELLS_ACROSS; x++) {
-        this.ground.fillStyle(TERRAIN_COLORS[terrainAt(this.seed, x, y)]);
+        const isDepleted = this.gatheredCells.some((cell) =>
+          cell.x === x && cell.y === y
+        );
+        if (isDepleted) {
+          this.ground.fillStyle(0x333333);
+        } else {
+          this.ground.fillStyle(TERRAIN_COLORS[terrainAt(this.seed, x, y)]);
+        }
         this.ground.fillRect(
           x * CELL_SIZE,
           y * CELL_SIZE,
