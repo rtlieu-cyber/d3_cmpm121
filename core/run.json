@@ -1,0 +1,97 @@
+{
+  "seed": 121,
+  "commands": [
+    { "type": "gather" },
+    { "type": "move", "direction": "west" },
+    { "type": "gather" },
+    { "type": "move", "direction": "south" },
+    { "type": "move", "direction": "south" },
+    { "type": "move", "direction": "south" },
+    { "type": "move", "direction": "south" },
+    { "type": "gather" },
+    {
+      "type": "craft",
+      "recipe": {
+        "output": "insulated wire",
+        "ingredients": { "scrap metal": 2, "biofiber": 1 }
+      }
+    },
+    { "type": "move", "direction": "east" },
+    { "type": "gather" },
+    { "type": "move", "direction": "north" },
+    { "type": "gather" },
+    { "type": "move", "direction": "west" },
+    { "type": "gather" },
+    { "type": "move", "direction": "west" },
+    { "type": "move", "direction": "south" },
+    { "type": "gather" },
+    {
+      "type": "craft",
+      "recipe": {
+        "output": "filter suit",
+        "ingredients": { "insulated wire": 1, "biofiber": 2 }
+      }
+    },
+    { "type": "move", "direction": "east" },
+    { "type": "move", "direction": "east" },
+    { "type": "move", "direction": "east" },
+    { "type": "move", "direction": "east" },
+    { "type": "move", "direction": "east" },
+    { "type": "move", "direction": "east" },
+    { "type": "move", "direction": "east" },
+    { "type": "move", "direction": "east" },
+    { "type": "move", "direction": "north" },
+    { "type": "move", "direction": "north" },
+    { "type": "move", "direction": "north" },
+    { "type": "move", "direction": "east" },
+    { "type": "gather" },
+    { "type": "move", "direction": "east" },
+    { "type": "gather" },
+    {
+      "type": "craft",
+      "recipe": {
+        "output": "power cell",
+        "ingredients": { "ion crystal": 2, "scrap metal": 1 }
+      }
+    },
+    { "type": "move", "direction": "east" },
+    { "type": "gather" },
+    { "type": "move", "direction": "south" },
+    { "type": "move", "direction": "south" },
+    { "type": "gather" },
+    { "type": "move", "direction": "west" },
+    { "type": "gather" },
+    { "type": "move", "direction": "south" },
+    { "type": "gather" },
+    {
+      "type": "craft",
+      "recipe": {
+        "output": "insulated wire",
+        "ingredients": { "scrap metal": 2, "biofiber": 1 }
+      }
+    },
+    {
+      "type": "craft",
+      "recipe": {
+        "output": "signal amplifier",
+        "ingredients": { "ion crystal": 1, "insulated wire": 1 }
+      }
+    },
+    { "type": "move", "direction": "west" },
+    { "type": "move", "direction": "north" },
+    { "type": "gather" },
+    { "type": "move", "direction": "west" },
+    { "type": "gather" },
+    {
+      "type": "craft",
+      "recipe": {
+        "output": "rescue beacon",
+        "ingredients": {
+          "power cell": 1,
+          "signal amplifier": 1,
+          "scrap metal": 3
+        }
+      }
+    }
+  ]
+}

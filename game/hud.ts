@@ -49,6 +49,22 @@ export class Hud {
 
   show(event: GameEvent) {
     element("live").textContent = describe(event);
+
+    if (event.type === "gameEnded") {
+      const banner = document.getElementById("win-banner");
+
+      if (banner) {
+        banner.hidden = false;
+      }
+
+      const objective = document.getElementById("objective-text");
+
+      if (objective) {
+        objective.textContent =
+          "Mission complete! Rescue signal transmitted. Extraction inbound.";
+      }
+    }
+
     if (event.type === "moved") this.showPosition(event.to.x, event.to.y);
     if (event.type === "gathered") {
       this.gatheredCells.push({ ...event.at });
