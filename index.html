@@ -30,7 +30,49 @@
             <span><i class="signal-light" aria-hidden="true"></i> DISPLAY ACTIVE</span>
             <span>WORLD EXPLORER / 800 × 600</span>
           </div>
+
           <div id="grid"></div>
+
+          <!-- Victory overlay: hidden until the Rescue Beacon is crafted -->
+          <div
+            id="win-banner"
+            class="victory-overlay"
+            role="status"
+            aria-live="polite"
+            hidden
+          >
+            <div class="victory-panel">
+              <div class="victory-icon">✦</div>
+
+              <p class="victory-eyebrow">
+      AF-01 // TRANSMISSION CONFIRMED
+    </p>
+
+              <h2>MISSION COMPLETE</h2>
+
+              <div class="victory-divider"></div>
+
+              <p class="victory-subtitle">
+      RESCUE BEACON ACTIVATED
+    </p>
+
+              <p class="victory-description">
+      Distress signal transmitted successfully.
+      Your coordinates have been received.
+      An extraction vessel is inbound.
+    </p>
+
+              <div class="victory-status">
+      <span class="victory-status-light"></span>
+      SIGNAL RECEIVED
+    </div>
+
+              <p class="victory-footer">
+      EXPEDITION COMPLETE // PRESS F5 TO RESTART
+    </p>
+            </div>
+          </div>
+
           <div class="screen-footer">
             <span>WORLD NAVIGATION</span>
             <span>ARROW KEYS TO MOVE</span>

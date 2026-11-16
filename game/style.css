@@ -524,3 +524,179 @@ body {
   flex: 0 0 auto;
   margin: auto;
 }
+
+/* =========================================================
+   ALIEN FRONTIER — VICTORY SCREEN
+   ========================================================= */
+
+/* Anchor overlay to the game display */
+.screen-module {
+  position: relative;
+}
+
+/* Cover only the Phaser display, not the entire console */
+.victory-overlay {
+  position: absolute;
+  top: 43px;
+  left: 10px;
+  width: 802px;
+  height: 602px;
+
+  z-index: 20;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: rgba(3, 12, 19, 0.88);
+  backdrop-filter: blur(7px);
+  border-radius: 3px;
+
+  animation: victory-fade-in 0.5s ease-out;
+}
+
+.victory-overlay[hidden] {
+  display: none !important;
+}
+
+/* Main victory panel */
+.victory-panel {
+  width: 540px;
+  max-width: 90%;
+  padding: 42px 36px 32px;
+
+  text-align: center;
+
+  background: linear-gradient(
+    160deg,
+    #152b3d,
+    #091824 75%
+  );
+
+  border: 2px solid #4deaff;
+  border-radius: 12px;
+
+  box-shadow:
+    0 0 25px rgba(77, 234, 255, 0.15),
+    0 0 80px rgba(77, 234, 255, 0.08),
+    inset 0 0 30px rgba(77, 234, 255, 0.04);
+
+  animation: victory-slide-in 0.5s ease-out;
+}
+
+.victory-icon {
+  color: #7dffbc;
+  font-size: 52px;
+  line-height: 1;
+  text-shadow: 0 0 24px rgba(125, 255, 188, 0.65);
+  margin-bottom: 18px;
+}
+
+.victory-eyebrow {
+  margin: 0 0 12px;
+  color: #7dffbc;
+  font: bold 11px Consolas, monospace;
+  letter-spacing: 0.18em;
+}
+
+.victory-panel h2 {
+  margin: 0;
+
+  color: #e6f4ff;
+  font: bold 32px Consolas, monospace;
+  letter-spacing: 0.08em;
+
+  text-shadow: 0 0 18px rgba(77, 234, 255, 0.3);
+}
+
+.victory-divider {
+  width: 85%;
+  height: 1px;
+  margin: 24px auto;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #4deaff,
+    transparent
+  );
+}
+
+.victory-subtitle {
+  margin: 0 0 14px;
+  color: #4deaff;
+
+  font: bold 13px Consolas, monospace;
+  letter-spacing: 0.12em;
+}
+
+.victory-description {
+  max-width: 390px;
+  margin: 0 auto 24px;
+
+  color: #a8bfce;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.victory-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+
+  padding: 11px 20px;
+
+  background: rgba(125, 255, 188, 0.08);
+  border: 1px solid rgba(125, 255, 188, 0.4);
+  border-radius: 6px;
+
+  color: #7dffbc;
+  font: bold 12px Consolas, monospace;
+  letter-spacing: 0.1em;
+}
+
+.victory-status-light {
+  width: 8px;
+  height: 8px;
+
+  background: #7dffbc;
+  border-radius: 50%;
+
+  box-shadow: 0 0 12px #7dffbc;
+}
+
+.victory-footer {
+  margin: 30px 0 0;
+
+  color: #6e8c9e;
+  font: 10px Consolas, monospace;
+  letter-spacing: 0.08em;
+}
+
+/* Entrance animations */
+@keyframes victory-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes victory-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .victory-overlay,
+  .victory-panel {
+    animation: none;
+  }
+}
