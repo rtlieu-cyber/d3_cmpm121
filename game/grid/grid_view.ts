@@ -13,10 +13,10 @@ const MARKER_COLOR = 0xf5e6a8;
 const BUMP_COLOR = 0xe0533d;
 
 const TERRAIN_COLORS: Record<Terrain, number> = {
-  "alien turf": 0x4c00b0,
-  "strange savanna": 0xa000c8,
-  "alien goo": 0xda8ee7,
-  "jagged mountain": 0x6e6a66,
+  "scrap flats": 0xb7410e,
+  "fungal grove": 0x658B38,
+  "toxic marsh": 0x4c00b0,
+  "basalt cliffs": 0x3e3a33,
 };
 
 // Enough cells to cover the view, plus a margin so that the camera can lag behind
