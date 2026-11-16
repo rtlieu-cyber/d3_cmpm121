@@ -3,10 +3,6 @@
    Sci-Fi Survival / Exploration Interface
    ========================================================= */
 
-/* -------------------------
-   Design Tokens
-   ------------------------- */
-
 :root {
   color-scheme: dark;
 
@@ -139,8 +135,6 @@ body::before {
   box-shadow:
     var(--panel-shadow),
     var(--glow-cyan);
-
-  perspective: 1200px;
 }
 
 /* Decorative frame corners */
@@ -172,8 +166,6 @@ body::before {
   display: block;
   max-width: 100%;
   border-radius: 4px;
-
-  transform: rotateX(6deg);
 }
 
 /* Cinematic dark edges */
@@ -186,12 +178,10 @@ body::before {
   pointer-events: none;
   border-radius: 4px;
 
-  transform: rotateX(6deg);
-
   background: radial-gradient(
     ellipse at center,
     transparent 55%,
-    rgb(0 0 0 / 45%) 100%
+    rgb(0 0 0 / 35%) 100%
   );
 }
 
@@ -669,10 +659,5 @@ button:disabled {
 @media (prefers-reduced-motion: reduce) {
   button {
     transition: none;
-  }
-
-  #grid canvas,
-  #grid::after {
-    transform: none;
   }
 }
