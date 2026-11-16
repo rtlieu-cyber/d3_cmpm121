@@ -6,7 +6,7 @@
 import { isPassable, type Terrain, terrainAt } from "./terrain.ts";
 // import { tokenize } from "jsr:@std/internal@^1.0.12/diff-str";
 import { possible_mats } from "./terrain.ts";
-import { type Recipe } from "./recipes.ts";
+import { capstone, type Recipe } from "./recipes.ts";
 
 export type Cell = { x: number; y: number };
 
@@ -19,6 +19,7 @@ export type GameState = {
   player: Cell;
   inventory: Record<string, number>;
   changed_cells: Cell[];
+  endgame: boolean;
 };
 
 // Command: https://gameprogrammingpatterns.com/command.html
@@ -47,6 +48,9 @@ export type GameEvent =
     inventory: Record<string, number>;
     output: string;
     missing: Record<string, number>;
+  }
+  | {
+    type: "gameEnded";
   };
 
 const STEPS: Record<Direction, Cell> = {
@@ -58,11 +62,20 @@ const STEPS: Record<Direction, Cell> = {
 
 // Singleton, avoided on purpose: tests make as many games as they need. https://gameprogrammingpatterns.com/singleton.html
 export function newGame(seed: number): GameState {
-  return { seed, player: { x: 0, y: 0 }, inventory: {}, changed_cells: [] };
+  return {
+    seed,
+    player: { x: 0, y: 0 },
+    inventory: {},
+    changed_cells: [],
+    endgame: false,
+  };
 }
 
 // The single way in. It updates the state it is given and returns the events.
 export function apply(state: GameState, command: Command): GameEvent[] {
+  if (state.endgame === true) {
+    return [];
+  }
   switch (command.type) {
     case "move":
       return move(state, command.direction);
@@ -82,7 +95,7 @@ function move(state: GameState, direction: Direction): GameEvent[] {
   const from = { ...state.player };
   const to = { x: from.x + step.x, y: from.y + step.y };
   const terrain = terrainAt(state.seed, to.x, to.y);
-  if (!isPassable(terrain)) {
+  if (!isPassable(terrain, state.inventory)) {
     return [{ type: "blocked", at: from, toward: to, terrain }];
   }
   state.player.x = to.x;
@@ -92,7 +105,7 @@ function move(state: GameState, direction: Direction): GameEvent[] {
 
 function gather(state: GameState): GameEvent[] {
   const terrain = terrainAt(state.seed, state.player.x, state.player.y);
-  const item = possible_mats[terrain];
+  const item = possible_mats[terrain].yields;
   if (
     !state.changed_cells.some((cell) =>
       cell.x === state.player.x && cell.y === state.player.y
@@ -120,6 +133,16 @@ function craft(state: GameState, recipe: Recipe): GameEvent[] {
       state.inventory[item] = state.inventory[item] - required;
     }
     state.inventory[recipe.output] = (state.inventory[recipe.output] ?? 0) + 1;
+    if (recipe.output === capstone) {
+      state.endgame = true;
+      return [{
+        type: "craftedSuccess",
+        inventory: { ...state.inventory },
+        output: recipe.output,
+      }, {
+        type: "gameEnded",
+      }];
+    }
     return [{
       type: "craftedSuccess",
       inventory: { ...state.inventory },

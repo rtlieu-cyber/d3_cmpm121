@@ -1,4 +1,9 @@
-import { type GameEvent, type GameState, terrainAt } from "../core/mod.ts";
+import {
+  type GameEvent,
+  type GameState,
+  possible_mats,
+  terrainAt,
+} from "../core/mod.ts";
 import { type Cell } from "../core/rules.ts";
 
 function element(id: string): HTMLElement {
@@ -10,6 +15,11 @@ function describe(event: GameEvent): string {
     case "moved":
       return `moved to ${event.to.x}, ${event.to.y}`;
     case "blocked":
+      if (possible_mats[event.terrain].opensWith !== null) {
+        return `blocked by ${event.terrain} at ${event.toward.x}, ${event.toward.y}, missing ${
+          possible_mats[event.terrain].opensWith
+        }`;
+      }
       return `blocked by ${event.terrain} at ${event.toward.x}, ${event.toward.y}`;
     case "gathered":
       return `gathered ${event.item} from ${event.terrain}`;
@@ -21,6 +31,8 @@ function describe(event: GameEvent): string {
           `${item}: ${count}`
         ).join(", ")
       }`;
+    case "gameEnded":
+      return `you won!`;
   }
 }
 

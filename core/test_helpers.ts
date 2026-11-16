@@ -13,6 +13,7 @@ export function searchForTerrain(targetTerrain: Terrain): GameState {
           player: { x, y },
           inventory: {},
           changed_cells: [],
+          endgame: false,
         };
       }
     }

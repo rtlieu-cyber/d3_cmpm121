@@ -25,3 +25,5 @@ export const blueprints: Recipe[] = [
     ingredients: { "power cell": 1, "signal amplifier": 1, "scrap metal": 3 },
   },
 ];
+
+export const capstone = "rescue beacon";

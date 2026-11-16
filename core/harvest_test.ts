@@ -10,14 +10,15 @@ const SEED = 121;
 // Searching keeps these tests honest if the terrain formula changes.
 function besideEasternCell(passable: boolean): GameState {
   for (let x = 2; x < 10_000; x++) {
-    const here = isPassable(terrainAt(SEED, x, 0));
-    const east = isPassable(terrainAt(SEED, x + 1, 0));
+    const here = isPassable(terrainAt(SEED, x, 0), {});
+    const east = isPassable(terrainAt(SEED, x + 1, 0), {});
     if (here && east === passable) {
       return {
         seed: SEED,
         player: { x, y: 0 },
         inventory: {},
         changed_cells: [],
+        endgame: false,
       };
     }
   }
@@ -84,7 +85,7 @@ Deno.test("an event keeps its cells while state moves on, and there's harvesting
   const firstGather = apply(state, { type: "gather" });
   apply(state, { type: "move", direction: "east" });
   apply(state, { type: "gather" });
-  const item = possible_mats[terrainAt(SEED, x, y)];
+  const item = possible_mats[terrainAt(SEED, x, y)].yields;
   assertNotEquals(firstGather[0], null);
   assert(firstGather[0]?.type === "gathered");
   assert(item !== null);
@@ -96,7 +97,7 @@ Deno.test("a harvestable terrain is harvested", () => {
   const { x, y } = state.player;
 
   apply(state, { type: "gather" });
-  const item = possible_mats[terrainAt(SEED, x, y)];
+  const item = possible_mats[terrainAt(SEED, x, y)].yields;
   assertNotEquals(item, null);
   if (item) {
     assertEquals(state.inventory[item], 1);

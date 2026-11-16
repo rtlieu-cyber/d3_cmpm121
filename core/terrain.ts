@@ -17,15 +17,27 @@ export function terrainAt(seed: number, x: number, y: number): Terrain {
   return noise(seed + 2, x, y, 6) < 0.45 ? "scrap flats" : "fungal grove";
 }
 
-export function isPassable(terrain: Terrain): boolean {
-  return terrain !== "toxic marsh" && terrain !== "basalt cliffs";
+export function isPassable(
+  terrain: Terrain,
+  inventory: Record<string, number>,
+): boolean {
+  if (terrain === "basalt cliffs") return false;
+  const openItem = possible_mats[terrain].opensWith;
+  if (openItem === null) return true;
+  if ((inventory[openItem] ?? 0) > 0) {
+    return true;
+  }
+  return false;
 }
 
-export const possible_mats: Record<Terrain, string | null> = {
-  "scrap flats": "scrap metal",
-  "fungal grove": "biofiber",
-  "toxic marsh": "ion crystal",
-  "basalt cliffs": null,
+export const possible_mats: Record<
+  Terrain,
+  { yields: string | null; opensWith: string | null }
+> = {
+  "scrap flats": { yields: "scrap metal", opensWith: null },
+  "fungal grove": { yields: "biofiber", opensWith: null },
+  "toxic marsh": { yields: "ion crystal", opensWith: "filter suit" },
+  "basalt cliffs": { yields: null, opensWith: null },
 };
 
 // Value noise: random numbers at coarse grid points, blended between them, so

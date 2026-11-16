@@ -38,15 +38,33 @@ Deno.test("crafting failure with insufficient ingredients", () => {
 });
 
 Deno.test("content test", () => {
-  const materials = Object.values(possible_mats).filter((item) =>
-    item !== null
+  const materialsYielded = Object.values(possible_mats).map((row) =>
+    row.yields
   );
+  const materialsFiltered = materialsYielded.filter((item) => item !== null);
   const outputs = blueprints.map((recipe) => recipe.output);
-  const validItems = new Set([...materials, ...outputs]);
+  const validItems = new Set([...materialsFiltered, ...outputs]);
 
   for (const blueprint of blueprints) {
     for (const item of Object.keys(blueprint.ingredients)) {
       assert(validItems.has(item));
     }
   }
+});
+
+Deno.test("checking double crafting event", () => {
+  const state = newGame(SEED);
+  state.inventory = {
+    "scrap metal": 4,
+    "biofiber": 2,
+  };
+  const first = apply(state, { type: "craft", recipe: blueprints[0] });
+  assert(first[0]?.type === "craftedSuccess");
+  const second = apply(state, { type: "craft", recipe: blueprints[0] });
+  assert(second[0]?.type === "craftedSuccess");
+  assertEquals(first[0].inventory, {
+    "insulated wire": 1,
+    "scrap metal": 2,
+    "biofiber": 1,
+  });
 });
