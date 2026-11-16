@@ -10,15 +10,58 @@
   <body>
     <main id="app">
       <div id="grid"></div>
+
       <aside id="hud">
-        <dl>
-          <dt>Position</dt>
-          <dd id="position"></dd>
-          <dt>Terrain</dt>
-          <dd id="terrain"></dd>
-        </dl>
-        <p id="live" aria-live="polite"></p>
-        <button id="mute" type="button" aria-pressed="false">Sound: on</button>
+        <section class="status-panel">
+          <h2>EXPLORER STATUS</h2>
+          <dl>
+            <dt>Position</dt>
+            <dd id="position"></dd>
+
+            <dt>Terrain</dt>
+            <dd id="terrain"></dd>
+          </dl>
+        </section>
+
+        <section id="inventory-panel">
+          <h2>INVENTORY</h2>
+          <ul id="inventory">
+            <li>
+              <span>No materials collected</span>
+            </li>
+          </ul>
+        </section>
+
+        <section id="crafting-panel">
+          <h2>CRAFTING STATION</h2>
+          <ul id="recipes">
+            <li>
+              <span class="recipe-missing">
+          No blueprints available
+        </span>
+            </li>
+          </ul>
+        </section>
+
+        <section id="goal">
+          <strong>MISSION OBJECTIVE</strong>
+          <p id="objective-text">
+      Gather resources, craft survival equipment,
+      and find a way off the planet.
+    </p>
+        </section>
+
+        <section id="system-panel">
+          <h2>SYSTEM LOG</h2>
+          <p id="live" aria-live="polite"></p>
+        </section>
+
+        <section id="controls">
+          <button id="mute" type="button"
+            aria-pressed="false">
+      Sound: on
+    </button>
+        </section>
       </aside>
     </main>
     <script type="module" src="/game/main.ts"></script>
